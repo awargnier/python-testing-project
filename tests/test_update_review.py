@@ -1,6 +1,6 @@
 import pytest
 
-from restaurant_reviews import RestaurantReviews
+from restaurant_reviews import RestaurantReviews,ReviewNotFoundError
 
 def test_update_existing_review():
   rr = RestaurantReviews()
@@ -12,5 +12,6 @@ def test_update_existing_review():
 
 def test_update_unexisting_review():
   rr = RestaurantReviews()
-  result = rr.update_review("Gros King", "Same Burger at Burger King but very high price", 1)
-  assert result == "Review not found"
+  with pytest.raises(ReviewNotFoundError) as excinfo:
+    rr.update_review("Gros King", "Same Burger at Burger King but very high price", 1)
+  assert str(excinfo.value) == "Review not found"

@@ -1,6 +1,6 @@
 import pytest
 
-from restaurant_reviews import RestaurantReviews
+from restaurant_reviews import RestaurantReviews, InvalidRatingError
 
 def test_add_valide_review():
   rr = RestaurantReviews() 
@@ -10,5 +10,6 @@ def test_add_valide_review():
 
 def test_add_invalide_rating():
   rr = RestaurantReviews()
-  result = rr.add_review("Cafe Mocha", "Good ambiance", 6)
-  assert result == "Invalide rating. It must be between 1 and 5"
+  with pytest.raises(InvalidRatingError) as excinfo:
+    rr.add_review("Cafe Mocha", "Good ambiance", 6)
+  assert str(excinfo.value) == "It must be between 1 and 5"

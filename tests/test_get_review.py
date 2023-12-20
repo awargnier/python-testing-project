@@ -1,6 +1,6 @@
 import pytest
 
-from restaurant_reviews import RestaurantReviews
+from restaurant_reviews import RestaurantReviews,ReviewNotFoundError
 
 def test_get_existing_review():
   rr = RestaurantReviews()
@@ -10,5 +10,6 @@ def test_get_existing_review():
 
 def test_get_unexisting_review():
   rr = RestaurantReviews()
-  result = rr.get_review("Le genie")
-  assert result == "Review not found"
+  with pytest.raises(ReviewNotFoundError) as excinfo:
+    rr.get_review("Le genie")
+  assert str(excinfo.value) == "Review not found"
