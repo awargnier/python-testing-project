@@ -1,41 +1,27 @@
+from classes.tips import total_with_tips, NegativeValueError
 import pytest
 
-def total_with_tip(bill,percentage):
-  if(bill < 0):
-    raise ValueError ("Bill should be positive")
-  if(percentage < 0):
-    raise ValueError ("Percentage should be positive")
-  
-  tip = percentage/100 * bill
-  if(tip > 500):
-    tip = 500
 
-  total = bill + tip
-  if total < 5:
-    total = 5
+def test_poor_service () :
+    assert total_with_tips(100,0) == 100
 
-  return round(total,2)
+def test_cheap_bill () :
+    assert total_with_tips(2.30,20) == 5
 
-def test_classic():
-  assert total_with_tip(100,20) == 120
+def test_normal_bill () :
+    assert total_with_tips(100,20) == 120
 
-def test_poor_service():
-  assert total_with_tip(100,0) == 100
+def test_expensive_bill () :
+    assert total_with_tips(5000,15) == 5500
 
-def test_tip_max():
-  assert total_with_tip(5000,15) == 5500
+def test_cents () : 
+    assert total_with_tips(10,33.3333) == 13.33
 
-def test_min_total():
-  assert total_with_tip(4,10) == 5
+def test_negative_error () :
+    with pytest.raises(NegativeValueError) as exceptionBill :
+        total_with_tips(-4,20)
+    assert str(exceptionBill.value) == "bill should be positive"
 
-def test_two_decimal():
-  assert total_with_tip(10,2.33) == 10.23
-
-def test_negative_error():
-  with pytest.raises(ValueError) as exceptionTips:
-    total_with_tip(100, -10)
-  assert str(exceptionTips.value) == "Percentage should be positive"
-
-  with pytest.raises(ValueError) as exceptionBill:
-    total_with_tip(-10, 10)
-  assert str(exceptionBill.value) == "Bill should be positive"
+    with pytest.raises(NegativeValueError) as exceptionTip :
+        total_with_tips(4,-20)
+    assert str(exceptionTip.value) == "percentage should be positive"

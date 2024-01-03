@@ -1,15 +1,19 @@
 import pytest
 
-from restaurant_reviews import RestaurantReviews, InvalidRatingError
+from classes.restaurant_reviews import RestaurantReviews, ReviewAlreadyExists
 
-def test_add_valide_review():
-  rr = RestaurantReviews() 
-  result = rr.add_review("Cafe Mocha", "Great coffee and pastries", 4)
-  assert result == "Review added for Cafe Mocha"
-  assert rr.get_review("Cafe Mocha") == {'review_text' : "Great coffee and pastries", 'rating': 4}
+def test_add_valid_review () :
+    rr = RestaurantReviews()
+    rr.add_review("Cafe Mocha", "Great coffee and pastries",5)
+    assert rr.reviews["Cafe Mocha"] == {'review_text':"Great coffee and pastries", 'rating':5}
 
-def test_add_invalide_rating():
-  rr = RestaurantReviews()
-  with pytest.raises(InvalidRatingError) as excinfo:
-    rr.add_review("Cafe Mocha", "Good ambiance", 6)
-  assert str(excinfo.value) == "It must be between 1 and 5"
+def test_add_invalid_review () :
+    with pytest.raises(ValueError) as e: #invalid rating
+        rr = RestaurantReviews()
+        rr.add_review("Cafe Mocha", "Worst coffe ever!", -99)
+    assert str(e.value) == "rating must be between 0 and 5 (given: -99)"
+    with pytest.raises(ReviewAlreadyExists) as e: #review already exists
+        rr = RestaurantReviews()
+        rr.add_review("Cafe Mocha", "Great coffee and pastries",5)
+        rr.add_review("Cafe Mocha", "Great coffee and pastries",5)
+    assert str(e.value) == "Cafe Mocha already has a review"

@@ -1,15 +1,24 @@
 import pytest
 
-from restaurant_reviews import RestaurantReviews,ReviewNotFoundError
+from classes.restaurant_reviews import RestaurantReviews,ReviewDoesNotExists
 
-def test_get_existing_review():
-  rr = RestaurantReviews()
-  rr.add_review("Une ptite biere ?", "Greatest beer i never drink", 5)
-  result = rr.get_review("Une ptite biere ?")
-  assert result == {'review_text' : "Greatest beer i never drink", 'rating': 5}
+@pytest.mark.parametrize("restaurant, expected_output",[
+    ("Default Diner", ({'review_text': 'Great burgers', 'rating': 5})),
+    ("Permanent Pizza", ({'review_text': 'Best pizzas for developers', 'rating': 5})),
+    ("Static Sushi", ({"review_text": "Fish was raw !", "rating": 1}))
+])
 
-def test_get_unexisting_review():
-  rr = RestaurantReviews()
-  with pytest.raises(ReviewNotFoundError) as excinfo:
-    rr.get_review("Le genie")
-  assert str(excinfo.value) == "Review not found"
+def test_get_valid_review (restaurant, expected_output, default_restaurant_reviews) :
+    rr = default_restaurant_reviews
+    assert rr.get_review(restaurant) == expected_output
+
+@pytest.mark.parametrize("restaurant, expected_output",[
+    ("Cafe Mocha", "Cafe Mocha does not have review"),
+    ("Best Burgers", "Best Burgers does not have review")
+])
+
+def test_get_invalid_review (restaurant, expected_output, default_restaurant_reviews) :
+    with pytest.raises(ReviewDoesNotExists) as e: 
+        rr = default_restaurant_reviews
+        rr.get_review(restaurant)
+    assert str(e.value) == expected_output
